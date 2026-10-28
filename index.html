@@ -1,0 +1,21 @@
+<!DOCTYPE html><html lang="bn"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Support 24H - Aviator</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<style>body{margin:0;background:#080c1e;color:#fff;font-family:sans-serif}.box{max-width:480px;margin:auto;padding:15px}.top{background:#121735;padding:14px;text-align:center;font-weight:900;border-bottom:2px solid #00a8ff;position:sticky;top:0}.card{background:#121735;border:1px solid #333;border-radius:14px;padding:14px}.input{width:100%;padding:12px;border-radius:10px;border:1px solid #333;background:#080c1e;color:#fff;margin-bottom:10px;box-sizing:border-box}.btn{width:100%;padding:13px;border-radius:12px;border:none;font-weight:900;background:#00a8ff;color:#fff;cursor:pointer}.msg{padding:10px 14px;border-radius:14px;margin-bottom:8px;max-width:80%;font-size:14px}.msg.user{background:#00a8ff;color:#fff;margin-left:auto}.msg.admin{background:#1d224d;border:1px solid #444;margin-right:auto}.chatBox{height:350px;overflow:auto;background:#0a0e1e;border-radius:12px;padding:10px;border:1px solid #222;margin-bottom:10px}</style></head><body>
+<div class="top">💬 Aviator Support 24H</div>
+<div class="box"><div class="card">
+<h3 style="color:#00a8ff">📩 মেসেজ করুন</h3>
+<input id="name" class="input" placeholder="আপনার নাম">
+<input id="phone" class="input" placeholder="ফোন নাম্বার (এটা দিয়েই চ্যাট হবে)">
+<div class="chatBox" id="chatBox"><div style="text-align:center;color:#666;padding:20px">ফোন নাম্বার লিখে Enter চাপুন</div></div>
+<textarea id="message" class="input" rows="3" placeholder="সমস্যা লিখুন..."></textarea>
+<button class="btn" onclick="sendMsg()">📤 পাঠান</button>
+</div></div>
+<script>
+const cfg={apiKey:"AIzaSyABNl-z1-x4dmJfNHoZVQHqRE5XnRHeB10",authDomain:"omor-7f5b7.firebaseapp.com",databaseURL:"https://omor-7f5b7-default-rtdb.firebaseio.com",projectId:"omor-7f5b7",storageBucket:"omor-7f5b7.firebasestorage.app",messagingSenderId:"170819945184",appId:"1:170819945184:web:4b7a0c2e5d8f9a0b1c2d3e"};
+firebase.initializeApp(cfg); const db=firebase.database();
+let currentPhone=null, listener=null;
+function render(msgs){let box=document.getElementById('chatBox');box.innerHTML='';msgs.forEach(m=>{let d=document.createElement('div');d.className='msg '+(m.sender=='admin'?'admin':'user');d.innerText=m.sender.toUpperCase()+': '+m.text;box.appendChild(d)});box.scrollTop=box.scrollHeight;}
+function loadChat(ph){if(listener)listener.off();listener=db.ref('supportChats/'+ph+'/messages');listener.on('value',s=>{if(!s.exists())return;let arr=[];s.forEach(v=>arr.push(v.val()));arr.sort((a,b)=>a.time-b.time);render(arr)})}
+document.getElementById('phone').addEventListener('change',()=>{let ph=document.getElementById('phone').value.trim();if(ph){currentPhone=ph;loadChat(ph)}});
+function sendMsg(){let n=document.getElementById('name').value.trim();let ph=document.getElementById('phone').value.trim();let t=document.getElementById('message').value.trim();if(!ph||!t)return alert('ফোন ও মেসেজ দিন');db.ref('supportChats/'+ph+'/info').set({name:n||'User',phone:ph,lastUpdate:Date.now()});db.ref('supportChats/'+ph+'/messages').push({sender:'user',text:t,time:Date.now()});document.getElementById('message').value='';loadChat(ph);alert('মেসেজ গেছে!')}
+</script></body></html>
